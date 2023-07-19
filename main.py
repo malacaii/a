@@ -1,12 +1,9 @@
 import socketio
 import aiohttp
 from aiohttp import web
-import aiohttp_jinja2
-import jinja2
 import asyncio
 from functools import cache
 from datetime import datetime
-import pytz
 from discord import SyncWebhook, Embed
 import os
 import json
@@ -14,14 +11,13 @@ import traceback
 from threading import Thread
 import time
 snd = "vergas"
-webhook_url = "https://discord.com/api/webhooks/1130555491546824705/VlmmzVZZwMoJl9mDEKYr2LDRAzTeJV6A8pocYRR_vH7PYkLE5p30HIpCprX51LxzMmjw"
+webhook_url = "https://discord.com/api/webhooks/1131263790541979708/BxIO3uGKXsGSeSt-m9DJ0ly9qKnIeXVgnuYntM44XDIAaUiN5U7iTArEQWSyq3AJhUDk"
 webhook = SyncWebhook.from_url(webhook_url)
 webhook2 = SyncWebhook.from_url(webhook_url)
 webhookconnect = SyncWebhook.from_url(webhook_url)
 webhookconnect2 = SyncWebhook.from_url(webhook_url)
 webhook_update = SyncWebhook.from_url(webhook_url)
 webhook_update2 = SyncWebhook.from_url(webhook_url)
-tz_VN = pytz.timezone('Asia/Ho_Chi_Minh')
 sio = socketio.AsyncServer()
 app = web.Application()
 connected_clients = set()
@@ -59,19 +55,15 @@ def update_run():
 blacklist = [1375927274,13610948761,13602628266,13979169103]
 update_run()
 
-with open("limited.txt") as f:
-  items = f.readlines()
 
 @cache
 class sever:
     # Configure Jinja2 template rendering
-    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('./templates'))
-    
     try:
     
       @sio.event
       async def connect(sid, environ):
-        datetime_VN = datetime.now(tz_VN)
+        datetime_VN = datetime.now
         global request
         request = environ['aiohttp.request']
         client_ip = request.headers['X-Forwarded-For'].split(',')[-1].strip()
@@ -98,7 +90,7 @@ class sever:
     
       @sio.event
       async def disconnect(sid):
-        datetime_VN = datetime.now(tz_VN)
+        datetime_VN = datetime.now
         timenow = datetime_VN.strftime("%m/%d/%Y, %H:%M:%S")
         if sid in connected_clients:
           print(timenow, ': Client disconnected IP:', client_ips[sid])
@@ -138,7 +130,7 @@ class sever:
       async def bot_buy_connected(sid, name):
         connected_clients.remove(sid)
         client_ips.pop(sid, None)
-        datetime_VN = datetime.now(tz_VN)
+        datetime_VN = datetime.now
         timenow = datetime_VN.strftime("%m/%d/%Y, %H:%M:%S")
         bot_ip = None
         if 'X-Forwarded-For' in request.headers:
@@ -162,7 +154,7 @@ class sever:
       async def bot_connected(sid, name):
         connected_clients.remove(sid)
         client_ips.pop(sid, None)
-        datetime_VN = datetime.now(tz_VN)
+        datetime_VN = datetime.now
         timenow = datetime_VN.strftime("%m/%d/%Y, %H:%M:%S")
         bot_ip = None
         if 'X-Forwarded-For' in request.headers:
@@ -181,8 +173,6 @@ class sever:
         webhook.send(embed=embed)
         webhook2.send(embed=embed)
         print('Total bots online:', len(connected_bots), '\n')
-    
-      @aiohttp_jinja2.template('index.html')
       async def index(request):
         return {}
     
